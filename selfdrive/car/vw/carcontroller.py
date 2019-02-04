@@ -82,7 +82,7 @@ class CarController(object):
       idx = (frame / P.STEER_STEP) % 16
 
       if CS.standstill:
-        apply_steer = 0
+        steer = 0
         lkas_enabled = 0
 
       can_sends.append(vwcan.create_steering_control(self.packer_gw, canbus.gateway, CS.CP.carFingerprint, steer, idx, lkas_enabled, right))
