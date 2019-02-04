@@ -29,6 +29,7 @@ def get_gateway_can_parser(CP, canbus):
     ("AB_Gurtwarn_VB", "Airbag_01", 0),         # Seatbelt warning, passenger
     ("ESP_Fahrer_bremst", "ESP_05", 0),         # Brake pedal pressed
     ("MO_Fahrpedalrohwert_01", "Motor_20", 0),  # Accelerator pedal value
+    ("ACC_Status_ACC", "ACC_06", 0),  # ACC engagement status
   ]
 
   checks = [
@@ -40,6 +41,7 @@ def get_gateway_can_parser(CP, canbus):
     ("Gateway_72", 10),   # From J533 CAN gateway (aggregated data)
     ("Getriebe_11", 20),  # From J743 Auto transmission control module
     ("Airbag_01", 20),    # From J234 Airbag control module
+    ("ACC_06", 50),  # From JXXX ACC radar control module
   ]
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.gateway)
@@ -49,12 +51,10 @@ def get_extended_can_parser(CP, canbus):
 
   signals = [
     # sig_name, sig_address, default
-    ("ACC_Status_ACC", "ACC_06", 0),             # ACC engagement status
   ]
 
   checks = [
     # sig_address, frequency
-    ("ACC_06", 50),       # From JXXX ACC radar control module
   ]
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.extended)
@@ -117,7 +117,7 @@ class CarState(object):
     self.seatbelt = not gw_cp.vl["Airbag_01"]["AB_Gurtwarn_VF"]
 
     self.steer_torque_driver = 0 #FIXME
-    self.acc_active = 1 if ex_cp.vl["ACC_06"]['ACC_Status_ACC'] > 2 else 0
+    self.acc_active = 1 if gw_cp.vl["ACC_06"]['ACC_Status_ACC'] > 2 else 0
     self.main_on = self.acc_active
 
     self.steer_override = abs(self.steer_torque_driver) > 1.0
