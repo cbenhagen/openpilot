@@ -1,7 +1,29 @@
-void vw_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {}
+int vw_ignition_started = 0;
+
+void vw_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
+  int bus_number = (to_push->RDTR >> 4) & 0xFF;
+  uint32_t addr;
+  if (to_push->RIR & 4)
+  {
+    // Extended
+    // Not looked at, but have to be separated
+    // to avoid address collision
+    addr = to_push->RIR >> 3;
+  }
+  else
+  {
+    // Normal
+    addr = to_push->RIR >> 21;
+  }
+
+  if (addr == 0x3c0 && bus_number == 0) {
+    uint32_t ign = (to_push->RDLR) & 0x200;
+    vw_ignition_started = ign > 0;
+  }
+}
 
 int vw_ign_hook() {
-  return -1; // use GPIO to determine ignition
+  return vw_ignition_started;
 }
 
 // FIXME
