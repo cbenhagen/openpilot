@@ -66,10 +66,10 @@ class CarInterface(object):
 
       ret.steerRatio = 14
       ret.steerActuatorDelay = 0.1
-      ret.steerRateCost = 0.5
+      ret.steerRateCost = 0.4
       ret.steerKf = 0.00006
       ret.steerKiBP, ret.steerKpBP = [[0.], [0.]] # m/s
-      ret.steerKpV, ret.steerKiV = [[0.375], [0.1]]
+      ret.steerKpV, ret.steerKiV = [[0.5], [0.15]]
       ret.steerMaxBP = [0.] # m/s
       ret.steerMaxV = [1.]
 
@@ -175,6 +175,13 @@ class CarInterface(object):
     # doors open
     ret.doorOpen = not self.CS.door_all_closed
 
+    # Gas, brakes and shifting
+    ret.gas = self.CS.pedal_gas / 100
+    ret.gasPressed = self.CS.pedal_gas > 0
+    ret.brakePressed = bool(self.CS.brake_pressed)
+    ret.brakeLights = bool(self.CS.brake_lights)
+    ret.gearShifter = self.CS.gear_shifter
+
     buttonEvents = []
 
     # blinkers
@@ -218,11 +225,20 @@ class CarInterface(object):
       if b.type == "cancel" and b.pressed:
         events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
 
+    # TODO: JY events in progress
+    if not ret.gearShifter == 'drive':
+      events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    if ret.doorOpen:
+      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    if ret.gearShifter == 'reverse':
+      events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+    if ret.gasPressed:
+      events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
+
     ret.events = events
 
     # update previous brake/gas pressed
     self.acc_active_prev = self.CS.acc_active
-
 
     # cast to reader so it can't be modified
     return ret.as_reader()

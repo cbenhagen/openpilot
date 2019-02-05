@@ -1,11 +1,14 @@
 import crcmod
 from selfdrive.car.vw.values import CAR, DBC
 
+# Python crcmod works differently from every other CRC calculator in the planet in some subtle
+# way. The implied leading 1 on the polynomial isn't a big deal, but for some reason, we need
+# to feed it initCrc 0x00 instead of 0xFF like it should be.
 vw_checksum = crcmod.mkCrcFun(0x12F, initCrc=0x00, rev=False, xorOut=0xFF)
 
 def create_steering_control(packer, bus, car_fingerprint, steer, idx, lkas_enabled, right):
   values = {
-    "CRC": 0xB5,
+    "CRC": 0xB5, # Magic value that stands in for the CRC during calculation
     "Counter": idx,
     "3": 3,
     "Steer_Torque": steer,
