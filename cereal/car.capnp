@@ -318,6 +318,7 @@ struct CarParams {
     chrysler @9;
     tesla @10;
     vw @11;
+    subaru @12;
   }
 
   # things about the car in the manual
