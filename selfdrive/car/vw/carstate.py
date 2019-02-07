@@ -5,6 +5,9 @@ from selfdrive.config import Conversions as CV
 from selfdrive.can.parser import CANParser, CANDefine
 from selfdrive.car.vw.values import DBC, CAR
 
+# TODO: Autodetect if we are connected to the camera or the gateway
+CONNECTED_TO_GATEWAY = False
+
 def get_gateway_can_parser(CP, canbus):
   # this function generates lists for signal, messages and initial values
   signals = [
@@ -32,7 +35,6 @@ def get_gateway_can_parser(CP, canbus):
     ("Driver_Strain", "EPS_01", 0),             # Absolute driver torque input
     ("Driver_Strain_VZ", "EPS_01", 0),          # Driver torque input sign
     ("ESP_Tastung_passiv", "ESP_21", 0),        # Stability control disabled
-    ("ACC_Status_ACC", "ACC_06", 0),  # ACC engagement status
   ]
 
   checks = [
@@ -46,8 +48,11 @@ def get_gateway_can_parser(CP, canbus):
     ("Gateway_72", 10),   # From J533 CAN gateway (aggregated data)
     ("Getriebe_11", 20),  # From J743 Auto transmission control module
     ("Airbag_01", 20),    # From J234 Airbag control module
-    ("ACC_06", 50),       # From J428 ACC radar control module
   ]
+
+  if not CONNECTED_TO_GATEWAY:
+    signals += ("ACC_Status_ACC", "ACC_06", 0) # ACC engagement status
+    checks += ("ACC_06", 50)  # From J428 ACC radar control module
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.gateway)
 
@@ -61,6 +66,10 @@ def get_extended_can_parser(CP, canbus):
   checks = [
     # sig_address, frequency
   ]
+
+  if CONNECTED_TO_GATEWAY:
+    signals += ("ACC_Status_ACC", "ACC_06", 0)  # ACC engagement status
+    checks += ("ACC_06", 50)  # From J428 ACC radar control module
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.extended)
 
@@ -165,5 +174,8 @@ class CarState(object):
 
     # Update ACC engagement
     # TODO: Get a little more sophisticated with ACC states and transitions later
-    self.acc_active = 1 if ex_cp.vl["ACC_06"]['ACC_Status_ACC'] > 2 else 0
+    if CONNECTED_TO_GATEWAY:
+      self.acc_active = 1 if ex_cp.vl["ACC_06"]['ACC_Status_ACC'] > 2 else 0
+    else:
+      self.acc_active = 1 if gw_cp.vl["ACC_06"]['ACC_Status_ACC'] > 2 else 0
     self.main_on = self.acc_active
