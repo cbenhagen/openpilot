@@ -130,8 +130,7 @@ class CarState(object):
     self.right_blinker_on = gw_cp.vl["Gateway_72"]['BH_Blinker_re']
 
     # Update seatbelt warning status
-    # TODO: Re-examine this method of getting seatbelt state, it doesn't work as hoped.
-    self.seatbelt = not gw_cp.vl["Airbag_01"]["AB_Gurtwarn_VF"]
+    self.seatbelt = not gw_cp.vl["Airbag_02"]["AB_Gurtschloss_FA"]
 
     # Update speed from ABS wheel speeds
     # TODO: Why aren't we using of of the perfectly good calculated speeds from the car?
