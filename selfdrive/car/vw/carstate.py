@@ -30,7 +30,9 @@ def get_gateway_can_parser(CP, canbus):
     ("GE_Fahrstufe", "Getriebe_11", 0),         # Transmission gear selector position
     ("AB_Gurtwarn_VF", "Airbag_01", 0),         # Seatbelt warning, driver
     ("AB_Gurtwarn_VB", "Airbag_01", 0),         # Seatbelt warning, passenger
+    ("AB_Gurtschloss_FA", "Airbag_02", 0),      # Seatbelt lock, driver
     ("ESP_Fahrer_bremst", "ESP_05", 0),         # Brake pedal pressed
+    ("ESP_Status_Bremsdruck", "ESP_05", 0),     # Brake pressure
     ("MO_Fahrpedalrohwert_01", "Motor_20", 0),  # Accelerator pedal value
     ("Driver_Strain", "EPS_01", 0),             # Absolute driver torque input
     ("Driver_Strain_VZ", "EPS_01", 0),          # Driver torque input sign
