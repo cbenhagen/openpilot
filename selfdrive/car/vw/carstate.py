@@ -51,8 +51,8 @@ def get_gateway_can_parser(CP, canbus):
   ]
 
   if not CONNECTED_TO_GATEWAY:
-    signals += ("ACC_Status_ACC", "ACC_06", 0) # ACC engagement status
-    checks += ("ACC_06", 50)  # From J428 ACC radar control module
+    signals += [("ACC_Status_ACC", "ACC_06", 0)] # ACC engagement status
+    checks += [("ACC_06", 50)]  # From J428 ACC radar control module
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.gateway)
 
@@ -68,8 +68,8 @@ def get_extended_can_parser(CP, canbus):
   ]
 
   if CONNECTED_TO_GATEWAY:
-    signals += ("ACC_Status_ACC", "ACC_06", 0)  # ACC engagement status
-    checks += ("ACC_06", 50)  # From J428 ACC radar control module
+    signals += [("ACC_Status_ACC", "ACC_06", 0)]  # ACC engagement status
+    checks += [("ACC_06", 50)]  # From J428 ACC radar control module
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.extended)
 
