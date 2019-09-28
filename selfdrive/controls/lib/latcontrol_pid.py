@@ -1,7 +1,8 @@
-from selfdrive.controls.lib.pid import PIController
-from selfdrive.controls.lib.drive_helpers import get_steer_max
 from cereal import car
 from cereal import log
+from selfdrive.controls.lib.drive_helpers import get_steer_max
+from selfdrive.controls.lib.pid import PIController
+from selfdrive.live_tune import LiveTune
 
 
 class LatControlPID(object):
@@ -10,11 +11,33 @@ class LatControlPID(object):
                             (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
                             k_f=CP.lateralTuning.pid.kf, pos_limit=1.0)
     self.angle_steers_des = 0.
+    self.live_tune = LiveTune(CP)
+    self.mpc_frame = 0
 
   def reset(self):
     self.pid.reset()
 
+  def apply_live_tune(self, CP):
+    self.mpc_frame += 1
+    if self.mpc_frame % 300 == 0:
+      self.live_tune.load()
+      if self.live_tune.enabled:
+        # Use values from /data/live_tune.json
+        self.pid.set_k_p((self.live_tune.kpBP, self.live_tune.kpV))
+        self.pid.set_k_i((self.live_tune.kiBP, self.live_tune.kiV))
+        self.pid.set_k_f(self.live_tune.kf)
+      else:
+        # Use values from interface.py
+        self.pid.set_k_p((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV))
+        self.pid.set_k_i((CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV))
+        self.pid.set_k_f(CP.lateralTuning.pid.kf)
+
+      self.mpc_frame = 0
+
   def update(self, active, v_ego, angle_steers, angle_steers_rate, eps_torque, steer_override, CP, VM, path_plan):
+    # Trigger Live tuning
+    self.apply_live_tune(CP)
+
     pid_log = log.ControlsState.LateralPIDState.new_message()
     pid_log.steerAngle = float(angle_steers)
     pid_log.steerRate = float(angle_steers_rate)
