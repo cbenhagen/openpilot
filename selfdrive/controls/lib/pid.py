@@ -35,6 +35,15 @@ class PIController(object):
   def k_i(self):
     return interp(self.speed, self._k_i[0], self._k_i[1])
 
+  def set_k_p(self, k_p):
+    self._k_p = k_p
+
+  def set_k_i(self, k_i):
+    self._k_i = k_i
+
+  def set_k_f(self, k_f):
+    self.k_f = k_f
+
   def _check_saturation(self, control, override, error):
     saturated = (control < self.neg_limit) or (control > self.pos_limit)
 
