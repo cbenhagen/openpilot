@@ -152,7 +152,8 @@ class CarInterface(object):
         # Documented steering ratio:
         #   Golf R and GTI: progressive 14.1:1 to 9.5:1, 2.1 turns L2L (less software stop for R)
         #   All other variants: static 13.6:1, 2.76 turns L2L
-        ret.steerRatio = 15.6 # LiveParams auto tuned for R
+        #ret.steerRatio = 15.6 # LiveParams auto tuned for R
+        ret.steerRatio = 14.1
         tire_stiffness_factor = 0.6 # LiveParams auto tuned
 
       # Mk7 Volkswagen Jetta (Sagitar in Chinese market), 2019-present
