@@ -88,7 +88,7 @@ class CarInterface(object):
       # Use the VIN to look up specific make and model details
       chassiscode = vin[6:8]
       # XXX temp hack to make everything an Atlas if no VIN detected
-      if(chassiscode == "00"):
+      if chassiscode == "00":
         chassiscode = "NE"
 
       # B8 Passat, RoW only (North America Passat of this era is PQ/NMS)
