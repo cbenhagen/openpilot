@@ -114,7 +114,19 @@ class CarInterface(object):
       elif chassiscode == "5E" or chassiscode == "NE":
         ret.mass = 1360
         ret.wheelbase = 2.69
-        # TODO: Untested vehicle
+        # Copied from Golf:
+        ret.centerToFront = ret.wheelbase * 0.45 # Estimated from public sources
+        ret.lateralTuning.pid.kf = 0.00006
+        # 0, 15, 50, 100, 250
+        ret.lateralTuning.pid.kpV = [0.05, 0.10, 0.15, 0.40, 0.50]
+        # ret.lateralTuning.pid.kpV = [0.05, 0.10, 0.15, 0.20, 0.50]
+        # ret.lateralTuning.pid.kpV = [0.10, 0.20, 0.30, 0.40, 0.50]
+        ret.lateralTuning.pid.kiV = [0.20, 0.15, 0.10, 0.05, 0.05]
+        # Documented steering ratio:
+        #   Golf R and GTI: progressive 14.1:1 to 9.5:1, 2.1 turns L2L (less software stop for R)
+        #   All other variants: static 13.6:1, 2.76 turns L2L
+        ret.steerRatio = 15.6 # LiveParams auto tuned for R
+        tire_stiffness_factor = 0.6 # LiveParams auto tuned
 
       # Mk3 Audi A3, S3, and RS3
       # TODO: Supportable but untested vehicle, will require test and tune
